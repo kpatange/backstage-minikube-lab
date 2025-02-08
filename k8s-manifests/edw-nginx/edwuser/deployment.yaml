@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edw-nginx-edwuser-deployment
+  namespace: edw-nginx
+  labels:
+    app: "edw-nginx-edwuser"
+    backstage.io/kubernetes-id: "edw-nginx-edwuser"
+    service: "edwuser"
+    system: "edw-nginx"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "edw-nginx-edwuser"
+      service: "edwuser"
+      system: "edw-nginx"
+  template:
+    metadata:
+      labels:
+        app: "edw-nginx-edwuser"
+        backstage.io/kubernetes-id: "edw-nginx-edwuser"
+        service: "edwuser"
+        system: "edw-nginx"
+    spec:
+      containers:
+        - name: edw-nginx-edwuser
+          image: <your-dockerhub-username>/edw-nginx-edwuser:0
+          ports:
+            - containerPort: 80
