@@ -1,0 +1,37 @@
+# template.yaml
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: snowflake-workspace-template
+  title: Create Snowflake Workspace
+spec:
+  owner: platform-team
+  type: service
+  parameters:
+    - title: Team Information
+      properties:
+        teamName:
+          title: Team Name
+          type: string
+        databaseName:
+          title: Database Name
+          type: string
+        warehouseSize:
+          title: Warehouse Size
+          type: string
+          enum: ['XSMALL', 'SMALL', 'MEDIUM', 'LARGE']
+          default: XSMALL
+  steps:
+    - id: createClaim
+      name: Create Snowflake Workspace
+      action: kubernetes:apply
+      input:
+        apiVersion: workspace.snowflake.org/v1alpha1
+        kind: SnowflakeWorkspaceClaim
+        metadata:
+          name: ${{ parameters.teamName }}-workspace
+          namespace: default
+        spec:
+          teamName: ${{ parameters.teamName }}
+          databaseName: ${{ parameters.databaseName }}
+          warehouseSize: ${{ parameters.warehouseSize }}
