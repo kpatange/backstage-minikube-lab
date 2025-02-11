@@ -1,28 +1,28 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: python-hello-template
-  title: Python Hello Template
-  description: A simple template to generate a Python script that says hello to a user.
+  name: snowflake-ucp-template
+  title: snowflake ucp Template
+  description: Onboard snowflake workspace2.
   tags:
-    - python
-    - hello-world
+    - ucp2
+    - snowflake2
 spec:
   owner: backstage/engineering
   type: service
 
   parameters:
-    - title: Provide your name
+    - title: Provide your details
       required:
-        - first_name
-        - last_name
+        - Team Name
+        - Application
       properties:
         first_name:
-          title: First Name
+          title: Team Name
           type: string
-          description: Your first name.
+          description: 
         last_name:
-          title: Last Name
+          title: Application Id
           type: string
           description: Your last name.
 
@@ -41,7 +41,7 @@ spec:
       action: publish:github
       input:
         allowedHosts: ['github.com']
-        description: "A Python project that says hello to ${{ parameters.first_name }} ${{ parameters.last_name }}."
+        description: "Snowflake Onboarding ${{ parameters.first_name }} ${{ parameters.last_name }}."
         repoUrl: ${{ parameters.repoUrl }}
 
   output:

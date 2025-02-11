@@ -3,10 +3,10 @@ kind: Template
 metadata:
   name: python-hello-template
   title: Python Hello Template
-  description: A simple template to generate a Python script that says hello to a user.
+  description: Onboard snowflake workspace.
   tags:
-    - python
-    - hello-world
+    - snowflake
+    - ucp
 spec:
   owner: backstage/engineering
   type: service
