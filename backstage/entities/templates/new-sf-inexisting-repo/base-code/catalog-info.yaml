@@ -9,7 +9,7 @@ metadata:
     backstage.io/techdocs-ref: dir:.
     backstage.io/kubernetes-id: ${{ values.system }}-${{ values.service }}
   tags:
-    - python
+    - snowflake
   links:
     - title: Documentation
       url: https://github.com/kpatange/backstage-minikube-lab

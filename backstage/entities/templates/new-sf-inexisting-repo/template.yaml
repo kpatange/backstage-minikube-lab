@@ -1,53 +1,114 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: snowflake-ucp-template
-  title: snowflake ucp Template
-  description: Onboard snowflake workspace2.
+  name: Snowflake UCP Onboarding
+  title: Snowflake UCP Onboarding
+  description: Creates all the boilerplate files and directories in an existing repo for deploying a new snowflake ucp  service in crossplane.
   tags:
-    - ucp2
-    - snowflake2
+    - snowflake
+    - crossplane
+    - ucp
 spec:
-  owner: backstage/engineering
+  owner: web@example.com
   type: service
-
   parameters:
-    - title: Provide your details
+    - title: Snowflake Onboarding
       required:
-        - Team Name
-        - Application
+        - system
+        - service
+        - description
+        - owner
       properties:
-        first_name:
-          title: Team Name
+        system:
+          title: System
           type: string
-          description: 
-        last_name:
-          title: Application Id
+          description: Name of the system the new service belongs to. Example -> 'my-app'
+          ui:field: EntityNamePicker
+          ui:autofocus: true
+        service:
+          title: Name
           type: string
-          description: Your last name.
+          description: Unique name of the new service. Example -> 'frontend'
+          ui:field: EntityNamePicker
+        description:
+          title: Description
+          type: string
+          description: Help others understand what this service is for
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the service
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+
+    - title: Choose a location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
 
   steps:
-    - id: fetch-base
-      name: Fetch Base
+    - id: fetch-base-code
+      name: Fetch Base Code
       action: fetch:template
       input:
-        url: ./template
+        url: ./base-code
+        targetPath: application-code/${{ parameters.system }}/${{ parameters.service }}
         values:
-          first_name: ${{ parameters.first_name }}
-          last_name: ${{ parameters.last_name }}
+          system: ${{ parameters.system }}
+          service: ${{ parameters.service }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+
+    - id: fetch-k8s-manifests
+      name: Fetch K8S Manifests
+      action: fetch:template
+      input:
+        url: ./k8s-manifests
+        targetPath: k8s-manifests/${{ parameters.system }}/${{ parameters.service }}
+        values:
+          system: ${{ parameters.system }}
+          service: ${{ parameters.service }}
+
+    - id: fetch-github-workflow
+      name: Fetch GitHub Workflow
+      action: fetch:template
+      input:
+        url: ./github-workflow
+        targetPath: .github/workflows
+        values:
+          system: ${{ parameters.system }}
+          service: ${{ parameters.service }}
 
     - id: publish
       name: Publish
-      action: publish:github
+      action: publish:github:pull-request
       input:
         allowedHosts: ['github.com']
-        description: "Snowflake Onboarding ${{ parameters.first_name }} ${{ parameters.last_name }}."
         repoUrl: ${{ parameters.repoUrl }}
+        title: "Create new project: ${{ parameters.system }}-${{ parameters.service }}"
+        branchName: create-${{ parameters.system }}-${{ parameters.service }}
+        description: |
+          # New project: ${{ parameters.system }}-${{ parameters.service }}
+
+          ${{ parameters.description if parameters.description }}
+        targetPath: "" # Leave empty to use the root of the repo or specify if needed
+        paths: 
+          - application-code/${{ parameters.system }}/${{ parameters.service }}
+          - k8s-manifests/${{ parameters.system }}-${{ parameters.service }}
+          - .github/workflows
 
   output:
     links:
-      - title: Repository
-        url: ${{ steps.publish.output.remoteUrl }}
-      - title: Open in GitHub
-        icon: github
-        url: ${{ steps.publish.output.remoteUrl }}
+      - url: ${{ steps.publish.output.remoteUrl }}
+        title: "Go to PR"
+
+
